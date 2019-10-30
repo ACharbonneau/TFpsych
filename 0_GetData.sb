@@ -1,3 +1,5 @@
 # schizophrenia from PGC https://www.med.unc.edu/pgc/results-and-downloads/scz/
 
 pgc.scz2.gz
+
+wget ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/GRCh37_latest/refseq_identifiers/GRCh37_latest_genomic.fna.gz
