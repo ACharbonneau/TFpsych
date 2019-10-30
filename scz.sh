@@ -1,3 +1,6 @@
+
+qsub -I -N MyJobName -l nodes=1:ppn=1,mem=64gb,walltime=00:24:00,feature='intel18'
+
 module load MEME/5.0.4
 
 module load BEDTools/2.27.1
