@@ -2,6 +2,9 @@ mkdir RawData
 
 cd RawData
 
+#All homosapiens TFs
+wget http://cisbp.ccbr.utoronto.ca/tmp/Homo_sapiens_2019_10_29_11:58_am.zip
+
 # schizophrenia from PGC https://www.med.unc.edu/pgc/results-and-downloads/scz/
 
 pgc.scz2.gz
