@@ -6,6 +6,11 @@ cd RawData
 
 pgc.scz2.gz
 
+# https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/
+wget https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
+
+gunzip hg19.fa.gz
+
 wget ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/GRCh37_latest/refseq_identifiers/GRCh37_latest_genomic.fna.gz
 
 gunzip GRCh37_latest_genomic.fna.gz
