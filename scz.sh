@@ -13,4 +13,7 @@ zcat ../RawData/pgc.scz2.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) pr
 
 bedtools getfasta -fi ../RawData/hg19.fa -bed pgc.scz2_regions.bed > pgc.scz2_regions.fasta
 
+bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed pgc.scz2_regions.bed > pgc.scz2_regions.tsv
+
+
 fimo ../pwms_all_motifs/allmotifs pgc.scz2_regions.fasta
