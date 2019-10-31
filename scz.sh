@@ -1,5 +1,5 @@
 
-qsub -I -N MyJobName -l nodes=1:ppn=1,mem=64gb,walltime=00:24:00,feature='intel18'
+qsub -I -N MyJobName -l nodes=1:ppn=1,mem=64gb,walltime=24:00:00,feature='intel18'
 
 module load MEME/5.0.4
 
