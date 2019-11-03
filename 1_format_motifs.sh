@@ -14,3 +14,7 @@ justone=`ls *.fixed | head -n 1`
 head -9 ${justone} > allmotifs
 
 for i in *.fixed; do tail -n +9 ${i} >> allmotifs; done
+
+# Change expected frequencies to 20% G   20% C    30% A   30% T
+
+sed -i 's/A 0.25000 C 0.25000 G 0.25000 T 0.25000/A 0.30000 C 0.20000 G 0.20000 T 0.30000/' allmotifs
