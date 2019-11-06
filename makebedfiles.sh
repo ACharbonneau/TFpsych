@@ -78,7 +78,8 @@ zcat ../RawData/ILAE_All_Epi_11.8.14.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0
 zcat ../RawData/Pankratz_Parkinsons_22687-SuppTable1.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0.0000001) print $1}' > Pankratz_Parkinsons_22687-SuppTable1.txt.snps
 grep -wf Pankratz_Parkinsons_22687-SuppTable1.txt.snps ../RawData/allsnps.bed | sort -k 4 > Pankratz_Parkinsons_22687-SuppTable1.txt.locations
 zcat ../RawData/Pankratz_Parkinsons_22687-SuppTable1.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0.0000001) print $1 "\t" $6}' | sort > Pankratz_Parkinsons_22687-SuppTable1.txt.pvals
-join -1 4 -2 1 Pankratz_Parkinsons_22687-SuppTable1.txt.locations Pankratz_Parkinsons_22687-SuppTable1.txt.pvals > Pankratz_Parkinsons_22687-SuppTable1.txt.bed
+join -1 4 -2 1 Pankratz_Parkinsons_22687-SuppTable1.txt.locations Pankratz_Parkinsons_22687-SuppTable1.txt.pvals > Pankratz_Parkinsons_22687-SuppTable1.txt.temp
+awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $7}' Pankratz_Parkinsons_22687-SuppTable1.txt.temp > Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed
 
 ##############################################
 ## Negative Control
@@ -87,7 +88,8 @@ join -1 4 -2 1 Pankratz_Parkinsons_22687-SuppTable1.txt.locations Pankratz_Parki
 zcat ../RawData/Fristche_AMDGene2013_Neovascular_v_Controls.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0.0000001) print $1}' > Fristche_AMDGene2013_Neovascular_v_Controls.txt.snps
 grep -wf Fristche_AMDGene2013_Neovascular_v_Controls.txt.snps ../RawData/allsnps.bed | sort -k 4 > Fristche_AMDGene2013_Neovascular_v_Controls.txt.locations
 zcat ../RawData/Fristche_AMDGene2013_Neovascular_v_Controls.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0.0000001) print $1 "\t" $6}' | sort > Fristche_AMDGene2013_Neovascular_v_Controls.txt.pvals
-join -1 4 -2 1 Fristche_AMDGene2013_Neovascular_v_Controls.txt.locations Fristche_AMDGene2013_Neovascular_v_Controls.txt.pvals > Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed
+join -1 4 -2 1 Fristche_AMDGene2013_Neovascular_v_Controls.txt.locations Fristche_AMDGene2013_Neovascular_v_Controls.txt.pvals > Fristche_AMDGene2013_Neovascular_v_Controls.txt.temp
+awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $7}' Fristche_AMDGene2013_Neovascular_v_Controls.txt.temp > Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed
 
 ### BMI
 zcat ../RawData/Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $1 "\t" $9}' > Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.bed
