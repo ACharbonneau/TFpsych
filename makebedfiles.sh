@@ -79,7 +79,7 @@ zcat ../RawData/Pankratz_Parkinsons_22687-SuppTable1.txt.gz | tail -n +2 | awk '
 grep -wf Pankratz_Parkinsons_22687-SuppTable1.txt.snps ../RawData/allsnps.bed | sort -k 4 > Pankratz_Parkinsons_22687-SuppTable1.txt.locations
 zcat ../RawData/Pankratz_Parkinsons_22687-SuppTable1.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$6)<0.0000001) print $1 "\t" $6}' | sort > Pankratz_Parkinsons_22687-SuppTable1.txt.pvals
 join -1 4 -2 1 Pankratz_Parkinsons_22687-SuppTable1.txt.locations Pankratz_Parkinsons_22687-SuppTable1.txt.pvals > Pankratz_Parkinsons_22687-SuppTable1.txt.temp
-awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $7}' Pankratz_Parkinsons_22687-SuppTable1.txt.temp > Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed
+awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $7}' Pankratz_Parkinsons_22687-SuppTable1.txt.temp > Pankratz_Parkinsons_22687-SuppTable1.txt.bed
 
 ##############################################
 ## Negative Control
@@ -96,3 +96,20 @@ zcat ../RawData/Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.gz | tail -
 
 ### Height
 zcat ../RawData/Meta-analysis_Wood_et_al+UKBiobank_2018.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $1 "\t" $9}' > Meta-analysis_Wood_et_al+UKBiobank_2018.txt.bed
+
+
+mkdir ../fastas
+
+for i in *.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
+
+for i in Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
+for i in Pankratz_Parkinsons_22687-SuppTable1.txt.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
+
+#bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed pgc.scz2_regions.bed > pgc.scz2_regions.tsv
+
+
+for i in ../fastas/*
+   do temp==`basename fastas/${i} fasta`
+   fimo --o ../${temp} ../pwms_all_motifs/allmotifs ${i}
+   done
+
