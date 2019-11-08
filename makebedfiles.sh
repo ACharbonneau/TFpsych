@@ -102,14 +102,11 @@ mkdir ../fastas
 
 for i in *.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
 
-for i in Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
-for i in Pankratz_Parkinsons_22687-SuppTable1.txt.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fastas/${i}.fasta; done
-
 #bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed pgc.scz2_regions.bed > pgc.scz2_regions.tsv
 
 
 for i in ../fastas/*
-   do temp==`basename fastas/${i} fasta`
+   do temp=`basename fastas/${i} .fasta`
    fimo --o ../${temp} ../pwms_all_motifs/allmotifs ${i}
    done
 
