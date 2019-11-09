@@ -107,6 +107,6 @@ for i in *.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fast
 
 for i in ../fastas/*
    do temp=`basename fastas/${i} .fasta`
-   fimo --o ../${temp} ../pwms_all_motifs/allmotifs ${i}
+   fimo --o ../${temp} ../RawData/pwms_all_motifs/allmotifs ${i}
    done
 
