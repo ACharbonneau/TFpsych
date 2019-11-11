@@ -105,7 +105,7 @@ for i in *.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fast
 
 mkdir ../namedfastas
 
-for i in *.bed ; do bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed ${i} > ../namedfastas/${i}.fasta; done
+#for i in *.bed ; do bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed ${i} > ../namedfastas/${i}.fasta; done
 
 ### scan FASTA files for motifs
 
@@ -114,3 +114,10 @@ for i in ../fastas/*
    fimo --o ../${temp} ../RawData/pwms_all_motifs/allmotifs ${i}
    done
 
+
+cd ../
+mkdir filteredscans
+
+for i in *.bed/fimo.tsv;
+   do temp=`echo${i} | sed 's/\..*//'`
+   join -1 3 -2 
