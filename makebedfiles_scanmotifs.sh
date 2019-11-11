@@ -97,6 +97,7 @@ zcat ../RawData/Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.gz | tail -
 ### Height
 zcat ../RawData/Meta-analysis_Wood_et_al+UKBiobank_2018.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $1 "\t" $9}' > Meta-analysis_Wood_et_al+UKBiobank_2018.txt.bed
 
+### Make FASTA files from bedfils
 
 mkdir ../fastas
 
@@ -104,6 +105,7 @@ for i in *.bed ; do bedtools getfasta -fi ../RawData/hg19.fa -bed ${i} > ../fast
 
 #bedtools getfasta -name -tab -fi ../RawData/hg19.fa -bed pgc.scz2_regions.bed > pgc.scz2_regions.tsv
 
+### scan FASTA files for motifs
 
 for i in ../fastas/*
    do temp=`basename fastas/${i} .fasta`
