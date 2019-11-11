@@ -115,8 +115,9 @@ for i in ../fastas/*
    done
 
 
-cd ../
-mkdir filteredscans
+#cd ../
+#mkdir filteredscans
+#for i in *.bed; do echo $(basename $i .bed); done
 
 for i in *.bed/fimo.tsv;
    do temp=`echo${i} | sed 's/\..*//'`
