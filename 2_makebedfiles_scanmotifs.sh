@@ -110,6 +110,8 @@ for i in ../fastas/*
    fimo --o ../${temp} ../RawData/pwms_all_motifs/allmotifs ${i}
 done
 
+# Compare conserved regions from 30 way primate to SNP windows
+
 for i in *.bed
    do temp=`basename fastas/${i} .fasta`
    bedtools intersect -wa -wb -a ../RawData/phastConsElements30way.bed -b ${i} > ../${i}/${i}.cons
