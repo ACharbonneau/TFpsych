@@ -1,0 +1,228 @@
+---
+title: "Motif Count Analysis"
+author: "Amanda Charbonneau"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    theme: "cerulean"
+    number_sections: true
+    toc: true
+    toc_depth: 5
+    toc_float: true
+    collapsed: false
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+# Install function for packages    
+packages<-function(x){
+  x<-as.character(match.call()[[2]])
+  if (!require(x,character.only=TRUE)){
+    install.packages(pkgs=x,repos="http://cran.r-project.org")
+    require(x,character.only=TRUE)
+  }
+}
+
+packages( plyr )
+packages( dplyr ) #munging
+packages(knitr)
+packages(DT)
+
+#packages( plotrix ) #shading
+#packages( cowplot ) #ggplot gridding
+#packages( lme4 ) #modeling
+#packages( ggthemes )
+#packages( ggplot2 ) #plotting
+#packages( reshape2 ) #munging
+#packages( car ) #anova
+
+
+```
+
+```{r globalvariables}
+
+qval1 <- .1
+qval2 <- .05
+
+```
+
+# Setup 
+
+I wrote some code to extract the full set of human transcription factor motifs from [CIS-BP]( http://cisbp.ccbr.utoronto.ca) and [turn them into a format useable by MEME](https://github.com/ACharbonneau/TFpsych/blob/master/1_format_motifs.sh). I then [took the results from a number of GWAS studies on human psychiatric diseases, extracted the SNPs with a p value of less than 1e-7, and searched a 200bp window centered on each SNP for all the TF motifs](https://github.com/ACharbonneau/TFpsych/blob/master/2_makebedfiles_scanmotifs.sh)
+
+This script takes the output of that pipeline and extracts hit counts.
+
+
+```{r GetData, warning=FALSE}
+
+sessionInfo()
+
+fimofile <- read.table("fimo.tsv", sep = "\t", header = T)
+fimofile$sequence_name <- as.character(fimofile$sequence_name)
+
+consfile <- read.table("*.cons")
+colnames(consfile) <- c("chr", "constart", "consend", "lod", "consscore", "chragain", "snpM100", "snpP100", "conservedsnpid", "pval")
+consfile$sequence_name <- paste(consfile$chr, ":", consfile$snpM100, "-", consfile$snpP100, sep="")
+#consids <- select(consfile, conservedsnpid, sequence_name, consscore, constart, consend) # %>% distinct()
+#consids <- select(consfile, conservedsnpid, sequence_name, consscore) %>% distinct()
+                  
+bedfile <- read.table("*.bed")
+colnames(bedfile) <- c("chr", "snpM100", "snpP100", "snpid", "pval")
+bedfile$sequence_name <- paste(bedfile$chr, ":", bedfile$snpM100, "-", bedfile$snpP100, sep="")
+
+useablesnps <- read.table("../RawData/ConsPeaks_FilterByAll_LDSR.txt", col.names = "snpid")
+useablesnps$here <- "Yes"
+
+idjoin <- left_join(fimofile, bedfile)
+
+filterjoin <- left_join(idjoin, useablesnps) %>% filter(here == "Yes")
+
+alljoin <- left_join(filterjoin, consfile)
+
+alljoin$snpbase <- alljoin$snpM100 + 100
+
+# are there conserved regions near snp?
+
+alljoin$conservedregions <- ifelse(is.na(alljoin$conservedsnpid)==TRUE, "No", "Yes")
+
+# is snp in a motif?
+
+alljoin$snpinmotif <- ifelse(alljoin$start <= 100 & alljoin$stop >= 100, "Yes", "No")
+
+# is snp in a conserved region?
+
+alljoin$snpinconserve <- ifelse(alljoin$constart < alljoin$snpbase & alljoin$snpbase < alljoin$consend, "Yes", "No")
+
+
+
+
+```
+
+
+## Filtering
+
+```{r filter}
+
+filtereddata <- alljoin %>% filter(q.value < qval1 ) %>% group_by(snpid, sequence_name, start, stop, motif_id, conservedregions, snpinconserve, snpinmotif) %>% summarise(n=n())
+
+
+```
+First, I've filtered all data to have a qvalue of less than `r qval1` and removed perfectly overlapping (palindrome) motif hits. This results in `r length(alljoin$snpid)` motif matches of `r length(unique(alljoin$sequence_name))` SNPs.
+
+A [second filtering step](https://github.com/ACharbonneau/ubiquitous-succotash/blob/master/2.0_metafiltering.sb) removes SNPs that were identified as being part of an LDSR catagory. SNPs are only retained if they were in the list of SNPs identified as conserved in the 30 primates data and were also NOT in any of:
+
+ * Coding_UCSC
+ * Promoter_UCSC
+ * UTR_3_UCSC
+ * UTR_5_UCSC
+ * Conserved_LindbladToh
+ * lincRNA
+ * miRNA
+ * rRNA
+ * TssAFlnk
+
+The above SNP list has `r length(useablesnps$snpid)` entries.
+
+Filtering this dataset by that SNP list leaves `r length(filtereddata$snpid)` motif matches of `r length(unique(filtereddata$sequence_name))` SNPs. 
+
+```{r testmotifhits}
+#motifs with n=2 were palindrome hits
+
+filteredbysnp <- alljoin %>% filter(q.value < qval1 ) %>% group_by(snpid, snpinconserve) %>% summarise(n=n())
+
+filteredbysnp$over5 <- ifelse(filteredbysnp$n >= 5, "Yes", "No")
+
+filteredbysnp$over10 <- ifelse(filteredbysnp$n >= 10, "Yes", "No")
+
+filteredbysnp$over20 <- ifelse(filteredbysnp$n >= 20, "Yes", "No")
+
+filteredbysnp$over50 <- ifelse(filteredbysnp$n >= 50, "Yes", "No")
+
+
+
+```
+
+## Testing motif hit numbers, qvalue of `r qval1`
+
+Our hypothesis is that conserved SNPs will have more surrounding motifs than non-conserved SNPs, and that they are conserved because they are as of yet unidentified enhancers. 
+
+I've taken the above data table and counted the number of motifs that match to a given SNP window and tallied them. Below are contingency tables for various count cutoffs. 
+
+A column set labeled 'over5' 'Yes' is the number of SNPs in the dataset that had five or more motifs hit in their 200bp window. 
+
+### 5 motif cutoff 
+```{r}
+
+
+ftable(filteredbysnp[,c(2,4)])
+
+```
+### 10 motif cutoff 
+
+```{r}
+ftable(filteredbysnp[,c(2,5)])
+
+```
+
+### 20 motif cutoff 
+
+```{r}
+ftable(filteredbysnp[,c(2,6)])
+```
+
+### 50 motif cutoff 
+
+```{r}
+
+ftable(filteredbysnp[,c(2,7)])
+```
+
+## Testing motif hit numbers, qvalue of `r qval2`
+
+This is the same type of data as the last section, however the qvalue filtering has been shifted to `r qval2`
+
+```{r stringenttestmotifhits}
+#motifs with n=2 were palindrome hits
+
+stringentfilteredbysnp <- alljoin %>% filter(q.value < qval2 ) %>% group_by(snpid, snpinconserve) %>% summarise(n=n())
+
+stringentfilteredbysnp$over5 <- ifelse(stringentfilteredbysnp$n >= 5, "Yes", "No")
+
+stringentfilteredbysnp$over10 <- ifelse(stringentfilteredbysnp$n >= 10, "Yes", "No")
+
+stringentfilteredbysnp$over20 <- ifelse(stringentfilteredbysnp$n >= 20, "Yes", "No")
+
+stringentfilteredbysnp$over50 <- ifelse(stringentfilteredbysnp$n >= 50, "Yes", "No")
+
+
+
+```
+
+### 5 motif cutoff 
+```{r}
+
+
+ftable(stringentfilteredbysnp[,c(2,4)])
+
+```
+### 10 motif cutoff 
+
+```{r}
+ftable(stringentfilteredbysnp[,c(2,5)])
+
+```
+
+### 20 motif cutoff 
+
+```{r}
+ftable(stringentfilteredbysnp[,c(2,6)])
+```
+
+### 50 motif cutoff 
+
+```{r}
+
+ftable(stringentfilteredbysnp[,c(2,7)])
+```
