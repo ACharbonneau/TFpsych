@@ -92,7 +92,7 @@ join -1 4 -2 1 Fristche_AMDGene2013_Neovascular_v_Controls.txt.locations Fristch
 awk '{print $2 "\t" $3 -100 "\t" $3 + 100 "\t" $1 "\t" $7}' Fristche_AMDGene2013_Neovascular_v_Controls.txt.temp > Fristche_AMDGene2013_Neovascular_v_Controls.txt.bed
 
 ### BMI
-zcat ../RawData/Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $1 "\t" $9}' > Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.bed
+zcat ../RawData/Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $3 "\t" $9}' > Meta-analysis_Locke_et_al+UKBiobank_2018_UPDATED.txt.bed
 
 ### Height
 zcat ../RawData/Meta-analysis_Wood_et_al+UKBiobank_2018.txt.gz | tail -n +2 | awk 'FNR > 1{if ((0+$9)<0.0000001) print "chr"$1 "\t" $2 - 100 "\t" $2 + 100 "\t" $1 "\t" $9}' > Meta-analysis_Wood_et_al+UKBiobank_2018.txt.bed
