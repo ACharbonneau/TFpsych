@@ -113,5 +113,7 @@ done
 for i in *.bed
    do temp=`basename fastas/${i} .fasta`
    bedtools intersect -wa -wb -a ../RawData/phastConsElements30way.bed -b ${i} > ../${i}/${i}.cons
+   cp ${i} ../${i}/${i}.bed
 done
    
+
