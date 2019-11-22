@@ -12,6 +12,13 @@ packages<-function(x){
 packages(knitr)
 packages(rmarkdown)
 
-args <- commandArgs()
+setwd("/Users/amanda/BrainTF")
 
-rmarkdown::render('TFpsych/3.1_Motif_Count.Rmd', input= args[1] output_file = args[1].html )
+datalist <- list.files(pattern = "*.bed")
+
+for( folder in datalist){
+    rmarkdown::render('TFpsych/3.1_Motif_Count.Rmd', output_file = paste( "../MotifCounts/",folder, ".html", sep=""),
+                  params = list(fimo = paste( folder, "/fimo.tsv", sep=""),
+                                cons = paste( folder, "/", folder, ".cons", sep=""),
+                                bed =  paste( folder, "/", folder, sep="")))
+}
